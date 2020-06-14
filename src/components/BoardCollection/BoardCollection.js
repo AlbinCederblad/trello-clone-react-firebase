@@ -44,46 +44,70 @@ const Boards = styled.div`
 `;
 
 class BoardCollection extends Component {
-    // I had to make this a class Component otherwise i wouldnt be able to call loadUserBoards
-    // without it getting stuck in an endless re-render loop.
     constructor(props) {
         super(props);
+
         this.handleClickBoard = this.handleClickBoard.bind(this);
+
     };
     componentDidMount() {
         this.props.loadUserBoards();
     };
 
-    handleClickBoard(uid) {
-        const { history } = this.props;
-        this.props.loadBoard(uid);
-        history.push("/board/" + uid);
+    handleClickBoard(e, boardId) {
+        if (e.target.className instanceof SVGAnimatedString || e.target.className.includes('inner')) {
+
+        } else {
+            const { history } = this.props;
+            this.props.loadBoard(boardId);
+            history.push("/board/" + boardId);
+        }
+
     };
 
     render() {
-        const boards = this.props.boards;
-        return (
-            <FadeIn>
-                <Collection>
-                    <Title>
-                        <AccountCircleIcon />
-                        <Spacing></Spacing>
-                        <p>Your boards</p>
-                    </Title>
-                    <Boards>
-                        {
-                            boards.map((board, index) => (
-                                <Spacing key={board.uid}>
-                                    <BoardTile onClick={() => this.handleClickBoard(board.uid)} index={index} title={board.title} key={board.uid} />
-                                </Spacing>
-                            ))
-                        }
-                    </Boards>
-                    <Spacing />
-                    <CreateBoardModal />
-                </Collection>
-            </FadeIn>
-        )
+        if (this.props.boards.isLoading) {
+            return (
+                <FadeIn>
+                    <Collection>
+                        <Title>
+                            <AccountCircleIcon />
+                            <Spacing></Spacing>
+                            <p>Your boards</p>
+                        </Title>
+                        <Boards>
+                        </Boards>
+                        <Spacing />
+                        <CreateBoardModal />
+                    </Collection>
+                </FadeIn>
+            );
+        } else {
+            const boardsList =
+                this.props.boards.boards.map((board, index) => (
+                    <Spacing key={board.boardId}>
+                        <BoardTile onClick={(e) => this.handleClickBoard(e, board.boardId)} index={index} title={board.title} key={board.boardId} boardId={board.boardId} />
+                    </Spacing>
+                ));
+            return (
+                <FadeIn>
+                    <Collection>
+                        <Title>
+                            <AccountCircleIcon />
+                            <Spacing></Spacing>
+                            <p>Your boards</p>
+                        </Title>
+                        <Boards>
+                            {
+                                boardsList
+                            }
+                        </Boards>
+                        <Spacing />
+                        <CreateBoardModal />
+                    </Collection>
+                </FadeIn>
+            )
+        }
     }
 }
 
