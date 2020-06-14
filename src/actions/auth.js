@@ -106,6 +106,16 @@ export const registerUser = (email, password, displayName) => dispatch => {
             userCredential.user.updateProfile({
                 displayName: displayName,
             }).then(() => {
+                const email = userCredential.user.email.replace(".", ","); // cannot save "." in DB
+                const userId = userCredential.user.uid;
+                const name = userCredential.user.displayName;
+                myFirebase.database().ref('/users/' + userId).set({
+                    email: email,
+                    name: name
+                });
+                myFirebase.database().ref('/emailToUid/').child(email).set({
+                    userId
+                })
                 dispatch(receiveRegister());
             });
         })
