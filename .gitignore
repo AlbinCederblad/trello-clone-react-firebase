@@ -13,6 +13,8 @@
 firebase-debug.log
 /.firebase
 /src/assets
+/src/firebase
+.firebaserc
 
 # misc
 .DS_Store
