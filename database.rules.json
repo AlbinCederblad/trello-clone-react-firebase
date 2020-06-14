@@ -1,21 +1,6 @@
 {
   "rules": {
-    "boards": {
-      ".read": "auth != null",
-      ".write": "auth != null",
-      ".indexOn": [
-        "members/uid"
-      ]
-    },
-    "board": {
-      "$board_id": {
-        ".read": "root.child('boards/' + $board_id + '/members/uid').val() == auth.uid",
-        ".write": "root.child('boards/' + $board_id + '/members/uid').val() == auth.uid && newData.exists()"
-      }
-    },
-    "users": {
-      ".read": "true",
-      ".write": "true"
-    }
+    ".read": "true",
+    ".write": "true"
   }
 }
