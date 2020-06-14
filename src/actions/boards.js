@@ -22,7 +22,7 @@ const receiveBoards = (boards) => {
         boards
     };
 };
-const getError = () => {
+const receiveBoardsError = () => {
     return {
         type: GET_BOARDS_FAIL
     };
@@ -56,9 +56,6 @@ const receiveBoardName = (name, boardId) => {
     };
 };
 
-
-
-
 export const createBoard = (title) => dispatch => {
     dispatch(requestCreateBoard());
 
@@ -69,21 +66,16 @@ export const createBoard = (title) => dispatch => {
         const uid = user.uid;
         const key = myFirebase.database().ref('boards/')
             .push({
-                title: title,
-                members: {
-                    uid
-                },
-                admins: {
-                    uid
-                },
+                title: title
             }, (err) => {
                 if (err) {
                     dispatch(createBoardError());
                 }
             }).key;
-        myFirebase.database().ref('/users/' + uid + "/boards").push({
-            key,
+        myFirebase.database().ref('boards/' + key + '/members').push({
+            uid: uid
         });
+        myFirebase.database().ref('/userBoards/' + uid).child(key).set(true);
         myFirebase.database().ref('/board/' + key).set({
             boardId: key,
             lists: { 0: { id: '0', title: 'Todo' } },
@@ -92,27 +84,73 @@ export const createBoard = (title) => dispatch => {
     }
 };
 
+export const deleteBoard = (boardId) => dispatch => {
+    // Get a list of all userIds from '/boards/boardId/members/' 
+    // Go through that list and delete all occurrences of boardId in each userId
+    myFirebase.database().ref('/boards/' + boardId + '/members/').once('value', function (snapshot) {
+        if (snapshot.exists()) {
+            snapshot.forEach(function (data) {
+                myFirebase.database().ref('/userBoards/' + data.val().uid).child(boardId).remove();
+            })
+        }
+    }).then(() => {
+        // remove from '/boards/'
+        myFirebase.database().ref('/boards/' + boardId).remove();
+
+        // remove from '/board/'
+        myFirebase.database().ref('/board/' + boardId).remove().then(() => {
+            dispatch(loadUserBoards());
+        });
+
+
+    });
+}
+
 export const loadUserBoards = () => dispatch => {
     dispatch(requestBoards());
     const user = myFirebase.auth().currentUser;
-    myFirebase.database().ref('/boards/').orderByChild("members/uid").equalTo(user.uid).once("value").then(function (snapshot) {
-        let boards = [];
+
+    // Get list of boardIds from /userBoards/
+    // Then get boards titles from /boards/ using the boardIds
+    let boards = [];
+    myFirebase.database().ref('/userBoards/' + user.uid).once('value', function (snapshot) {
 
         snapshot.forEach(function (data) {
-            const board = {
-                uid: data.key,
-                title: data.val().title,
-                admins: data.val().admins,
-                members: data.val().members,
-            }
-            boards.push(board);
+            myFirebase.database().ref('/boards/' + data.key).once('value', function (snap) {
+                if (snap.exists()) {
+                    boards.push({
+                        boardId: data.key,
+                        title: snap.val().title,
+                    });
+                }
+
+            }).then(() => {
+                dispatch(receiveBoards(boards));
+            })
         });
-        dispatch(receiveBoards(boards));
-    }).catch(err => {
-        dispatch(getError());
     });
-    return true;
 };
+
+export const addUserToBoard = (email, boardId) => dispatch => {
+    const emailWithoutDot = email.replace(".", ",");
+
+    // get userId from email
+    var userToAdd;
+    myFirebase.database().ref('/emailToUid/' + emailWithoutDot).child('userId').once('value', function (snapshot) {
+        if (snapshot.exists()) {
+            userToAdd = snapshot.val();
+            // Add boardId as key so that the boardIds are not duplicated 
+            // if a user is added to a board multiple times
+            myFirebase.database().ref('/userBoards/' + userToAdd).child(boardId).set(true);
+            // also add userid to members array
+            myFirebase.database().ref('/boards/' + boardId + '/members/').push({
+                uid: userToAdd
+            })
+        }
+    });
+
+    // Todo: dispatch if Add was successful & display error message
+}
 
 export const updateBoardName = (boardName, boardId) => dispatch => {
     myFirebase.database().ref('/boards/' + boardId).update({ title: boardName });
