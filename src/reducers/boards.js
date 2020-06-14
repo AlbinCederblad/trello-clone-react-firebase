@@ -5,22 +5,30 @@ import {
 } from "../actions/";
 
 export default (
-    state = [],
+    state = {
+        isLoading: true,
+        boards: []
+    },
     action
 ) => {
     switch (action.type) {
         case GET_BOARDS_SUCCESS:
-            return action.boards;
+            return { ...state, isLoading: false, boards: action.boards };
         case GET_BOARD_NAME_SUCCESS:
-            const newState = state.map(board => {
-                if (board.uid === action.boardId) {
+            if (!state.boards)
+                return { ...state };
+
+            const newState = state.boards.map(board => {
+                if (board.boardId === action.boardId) {
                     return { ...board, title: action.name }
                 } else {
                     return { ...board }
                 }
             });
-            return newState;
+            return { ...state, boards: newState };
 
+        case GET_BOARDS_REQUEST:
+            return { ...state, isLoading: true };
         default:
             return state;
     }
