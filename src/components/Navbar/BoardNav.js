@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import BoardMenu from './BoardMenu';
 import BoardTitleMenu from './BoardTitleMenu';
+import InviteMenu from './InviteMenu';
 
 // Icons/UI
 import styled from 'styled-components';
@@ -14,7 +15,7 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import { connect } from "react-redux";
 
 // Actions
-import { listenBoardName, updateBoardName, loadUserBoards } from "../../actions";
+import { listenBoardName, updateBoardName, loadUserBoards, addUserToBoard } from "../../actions";
 
 
 // CSS
@@ -32,13 +33,14 @@ const Nav = styled.div`
     z-index: 3;
 `;
 const NavActionsWrapper = styled.div`
-    position: relative;
+    display: inline-flex;
 `;
-const NameMenuButton = styled.div`
+const MenuActionButton = styled.div`
     border-radius: .3rem;
     background-color: rgba(255,255,255,0.24);
     color: white;
     padding: 0.4rem 0.6rem 0.4rem 0.6rem;
+    margin-right: 0.4rem;
     &:hover {
         background-color: rgba(255,255,255,0.35);
         cursor: pointer;
@@ -65,19 +67,35 @@ class BoardNav extends Component {
 
     constructor(props) {
         super(props);
-        const boardId = this.props.boardId;
-        this.props.loadUserBoards();
-        this.props.listenBoardName(boardId);
     }
 
     state = {
         showNameMenu: false,
         boardName: '',
+        showInviteMenu: false,
+        inviteEmail: '',
     }
 
     handleShowMenu = () => {
         this.setState({
             showNameMenu: !this.state.showNameMenu,
+        });
+    }
+
+    handleShowInvite = () => {
+        this.setState({
+            showInviteMenu: !this.state.showInviteMenu,
+        });
+    }
+
+    handleSubmitInvite = (e) => {
+        e.preventDefault();
+        const email = this.state.inviteEmail;
+        if (email.length > 0 && email.length < 50) {
+            this.props.addUserToBoard(email, this.props.boardId);
+        }
+        this.setState({
+            showInviteMenu: !this.state.showInviteMenu,
         });
     }
 
@@ -99,11 +117,18 @@ class BoardNav extends Component {
         });
     }
 
+    onEmailChange = (e) => {
+        e.preventDefault();
+        this.setState({
+            inviteEmail: e.target.value,
+        });
+    }
+
     getName = () => {
         const boardId = this.props.boardId;
         let title = '';
-        this.props.boards.forEach((board) => {
-            if (board.uid === boardId) {
+        this.props.boards.boards.forEach((board) => {
+            if (board.boardId === boardId) {
                 title = board.title;
             }
         });
@@ -111,31 +136,44 @@ class BoardNav extends Component {
     }
 
 
-    /*componentDidMount = () => {
+    componentDidMount = () => {
         const boardId = this.props.boardId;
         this.props.loadUserBoards();
         this.props.listenBoardName(boardId);
-    }*/
+    }
 
     render() {
+        if (this.props.boards.isLoading) {
+            return (<div></div>);
+        }
         return (
             <NavWrapper>
                 <BoardMenu />
-                <NameMenuButton onClick={this.handleShowMenu}>
-                    {this.getName()}
-                </NameMenuButton>
-                {this.state.showNameMenu && (
-                    <BoardTitleMenu
-                        handleShowMenu={this.handleShowMenu}
-                        handleNameSubmit={this.handleNameSubmit}
-                        placeholder={this.state.boardName}
-                        onNameChange={this.onNameChange}
-                    />
-                )}
+
+
                 <Nav>
-
                     <NavActionsWrapper>
-
+                        <MenuActionButton onClick={this.handleShowMenu}>
+                            {this.getName()}
+                        </MenuActionButton>
+                        {this.state.showNameMenu && (
+                            <BoardTitleMenu
+                                handleShowMenu={this.handleShowMenu}
+                                handleNameSubmit={this.handleNameSubmit}
+                                placeholder={this.state.boardName}
+                                onNameChange={this.onNameChange}
+                            />
+                        )}
+                        <MenuActionButton onClick={this.handleShowInvite}>
+                            Invite
+                        </MenuActionButton>
+                        {this.state.showInviteMenu && (
+                            <InviteMenu
+                                handleShowInvite={this.handleShowInvite}
+                                handleSubmitInvite={this.handleSubmitInvite}
+                                onEmailChange={this.onEmailChange}
+                            />
+                        )}
 
                     </NavActionsWrapper>
                 </Nav>
@@ -153,4 +191,4 @@ const mapStateToProps = state => ({
     board: state.board
 });
 
-export default connect(mapStateToProps, { listenBoardName, updateBoardName, loadUserBoards })(BoardNav);
+export default connect(mapStateToProps, { listenBoardName, updateBoardName, loadUserBoards, addUserToBoard })(BoardNav);
