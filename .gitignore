@@ -9,12 +9,13 @@
 /coverage
 
 # production
+/src/unsplash
 /build
 firebase-debug.log
 /.firebase
 /src/assets
 /src/firebase
-.firebaserc
+yarn.lock
 
 # misc
 .DS_Store
