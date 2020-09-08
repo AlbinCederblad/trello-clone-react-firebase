@@ -119,7 +119,7 @@ const MenuArrow = styled.button`
     font-weight: bold;
 
     position: absolute;
-    top: 12px;
+    top: 16px;
     transition: .25s all;
     left: 2rem;
 
