@@ -47,9 +47,10 @@ const receiveRegister = user => {
     }
 }
 
-const registerError = () => {
+const registerError = (message) => {
     return {
-        type: REGISTER_FAILURE
+        type: REGISTER_FAILURE,
+        message
     };
 };
 
@@ -83,7 +84,7 @@ const verifySuccess = () => {
     };
 };
 
-export const loginUser = (email, password, history) => dispatch => {
+export const loginUser = (email, password, history) => async dispatch => {
     dispatch(requestLogin());
     myFirebase
         .auth()
@@ -98,7 +99,7 @@ export const loginUser = (email, password, history) => dispatch => {
         });
 };
 
-export const registerUser = (email, password, displayName) => dispatch => {
+export const registerUser = (email, password, displayName, callback) => async dispatch => {
     dispatch(requestRegister());
     myFirebase.auth()
         .createUserWithEmailAndPassword(email, password)
@@ -117,15 +118,16 @@ export const registerUser = (email, password, displayName) => dispatch => {
                     userId
                 })
                 dispatch(receiveRegister());
+                callback();
             });
         })
         .catch(error => {
             // Do something with the error if you want!
-            dispatch(registerError());
+            dispatch(registerError(error.message));
         });
 };
 
-export const logoutUser = () => dispatch => {
+export const logoutUser = () => async dispatch => {
     dispatch(requestLogout());
     myFirebase
         .auth()
@@ -139,7 +141,7 @@ export const logoutUser = () => dispatch => {
         });
 };
 
-export const verifyAuth = () => dispatch => {
+export const verifyAuth = () => async dispatch => {
     dispatch(verifyRequest());
     myFirebase.auth().onAuthStateChanged(user => {
         if (user !== null) {

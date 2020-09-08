@@ -58,7 +58,6 @@ const receiveBoardName = (name, boardId) => {
 
 export const createBoard = (title) => dispatch => {
     dispatch(requestCreateBoard());
-
     const user = myFirebase.auth().currentUser;
     if (!user) {
         dispatch(createBoardError());
@@ -96,25 +95,20 @@ export const deleteBoard = (boardId) => dispatch => {
     }).then(() => {
         // remove from '/boards/'
         myFirebase.database().ref('/boards/' + boardId).remove();
-
         // remove from '/board/'
         myFirebase.database().ref('/board/' + boardId).remove().then(() => {
             dispatch(loadUserBoards());
         });
-
-
     });
 }
 
 export const loadUserBoards = () => dispatch => {
     dispatch(requestBoards());
     const user = myFirebase.auth().currentUser;
-
     // Get list of boardIds from /userBoards/
     // Then get boards titles from /boards/ using the boardIds
     let boards = [];
     myFirebase.database().ref('/userBoards/' + user.uid).once('value', function (snapshot) {
-
         snapshot.forEach(function (data) {
             myFirebase.database().ref('/boards/' + data.key).once('value', function (snap) {
                 if (snap.exists()) {
@@ -123,7 +117,6 @@ export const loadUserBoards = () => dispatch => {
                         title: snap.val().title,
                     });
                 }
-
             }).then(() => {
                 dispatch(receiveBoards(boards));
             })
@@ -133,7 +126,6 @@ export const loadUserBoards = () => dispatch => {
 
 export const addUserToBoard = (email, boardId) => dispatch => {
     const emailWithoutDot = email.replace(".", ",");
-
     // get userId from email
     var userToAdd;
     myFirebase.database().ref('/emailToUid/' + emailWithoutDot).child('userId').once('value', function (snapshot) {
@@ -148,7 +140,6 @@ export const addUserToBoard = (email, boardId) => dispatch => {
             })
         }
     });
-
     // Todo: dispatch if Add was successful & display error message
 }
 

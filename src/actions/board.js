@@ -141,10 +141,12 @@ export const loadBoard = (uid) => dispatch => {
 
 export const listenBoard = (uid) => dispatch => {
     myFirebase.database().ref('/board/' + uid).on('value', function (snapshot) {
-        const board = {
-            boardId: snapshot.val().boardId,
-            lists: snapshot.val().lists,
+        if (snapshot.val() != null) {
+            const board = {
+                boardId: snapshot.val().boardId,
+                lists: snapshot.val().lists,
+            }
+            dispatch(receiveBoard(board));
         }
-        dispatch(receiveBoard(board));
     });
 };

@@ -1,19 +1,13 @@
-import React from 'react';
-
-// Redux / Actions
-import { useDispatch, useSelector, useStore } from 'react-redux';
-import { deleteCard, updateBoard } from '../../actions';
-
-// UI
-import styled from 'styled-components';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-
-
-// Drag and drop
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import { useDispatch, useStore } from 'react-redux';
+import styled from 'styled-components';
+
+import { deleteCard, updateBoard } from '../../actions';
 
 const Div = styled.div`
     margin-bottom: 8px;

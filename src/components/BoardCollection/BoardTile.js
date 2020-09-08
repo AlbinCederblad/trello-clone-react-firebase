@@ -1,16 +1,11 @@
-import React from 'react';
-
-// UI
-import styled from 'styled-components';
-import FadeIn from 'react-fade-in';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-
-// actions
-import { deleteBoard } from '../../actions';
+import React from 'react';
+import FadeIn from 'react-fade-in';
 import { useDispatch } from "react-redux";
+import styled from 'styled-components';
 
-
+import { deleteBoard } from '../../actions';
 
 const TileOptions = styled.div`
     position: absolute;

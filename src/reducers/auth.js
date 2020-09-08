@@ -20,6 +20,7 @@ export default (
         registerError: false,
         isAuthenticated: false,
         error: false,
+        errorMessage: '',
         user: {}
     },
     action
@@ -29,14 +30,16 @@ export default (
             return {
                 ...state,
                 isLoading: true,
-                loginError: false
+                loginError: false,
+                errorMessage: '',
             };
         case LOGIN_SUCCESS:
             return {
                 ...state,
                 isLoading: false,
                 isAuthenticated: true,
-                user: action.user
+                user: action.user,
+                errorMessage: '',
             };
         case LOGIN_FAILURE:
             return {
@@ -61,6 +64,7 @@ export default (
         case REGISTER_FAILURE:
             return {
                 ...state,
+                errorMessage: action.message,
                 isLoading: false,
                 isAuthenticated: false,
             };

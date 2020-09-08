@@ -1,11 +1,9 @@
+import CssBaseline from "@material-ui/core/CssBaseline";
 import React from "react";
-
 import { Provider } from "react-redux";
 
 import App from "./App";
 import configureStore from "./configureStore";
-
-import CssBaseline from "@material-ui/core/CssBaseline";
 
 const store = configureStore();
 
@@ -13,7 +11,9 @@ function Root() {
     return (
         <Provider store={store}>
             <CssBaseline />
+
             <App />
+
         </Provider>
     );
 }

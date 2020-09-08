@@ -1,22 +1,17 @@
-import React from 'react';
-
-// Redux / Actions
-import { useDispatch, useStore } from 'react-redux';
-import { deleteList, updateBoard } from '../../actions';
-
-// UI / UX
-import styled from 'styled-components';
-import FadeIn from 'react-fade-in';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React from 'react';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
+import FadeIn from 'react-fade-in';
+import { useDispatch, useStore } from 'react-redux';
+import styled from 'styled-components';
 
-import TrelloCard from './Card';
+import { deleteList, updateBoard } from '../../actions';
 import ActionButton from './ActionButton';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
-
+import TrelloCard from './Card';
 
 const ListStyle = styled.div`
-    background-color: rgb(235, 236, 240);
+    background-color: #ebecf0;
     border-radius: 3px;
     width: 300px;
     height: 100%;
