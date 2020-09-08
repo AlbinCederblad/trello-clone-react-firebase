@@ -55,7 +55,7 @@ class CreateBoardModal extends Component {
         const classes = this.props;
         return (
             <Fragment>
-                <Button variant="outlined" color="primary" onClick={this.toggleOpen}>
+                <Button variant="contained" color="primary" onClick={this.toggleOpen}>
                     Create new board
                 </Button>
                 <Dialog open={this.state.open} onClose={this.toggleOpen} >
@@ -87,5 +87,6 @@ class CreateBoardModal extends Component {
         );
     }
 }
+
 
 export default connect(null, { createBoard, loadUserBoards })(withStyles(styles)(CreateBoardModal));

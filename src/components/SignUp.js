@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
+import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import React, { useState } from 'react';
+import { connect, useDispatch } from "react-redux";
 import { NavLink, Redirect } from 'react-router-dom';
 
-import { useDispatch } from "react-redux";
 import { registerUser } from "../actions/";
 
 const useStyles = makeStyles(theme => ({
@@ -21,6 +20,9 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        background: 'rgba(255, 255, 255, 0.8)',
+        padding: '2rem',
+        borderRadius: '1rem',
     },
     avatar: {
         margin: theme.spacing(1),
@@ -32,10 +34,11 @@ const useStyles = makeStyles(theme => ({
     },
     submit: {
         margin: theme.spacing(3, 0, 2),
+        backgroundColor: '#026aa7'
     },
 }));
 
-export default function SignUp() {
+const SignUp = ({ auth, history }) => {
     const classes = useStyles();
 
     const dispatch = useDispatch();
@@ -55,8 +58,8 @@ export default function SignUp() {
 
     const handleSignUp = (e) => {
         e.preventDefault();
-        dispatch(registerUser(state.email, state.password, state.displayName));
-        setState({ toFrontpage: true });
+        dispatch(registerUser(state.email, state.password, state.displayName, () => history.push("/")));
+        //setState({ toFrontpage: true });
     };
 
     const redirect = (
@@ -113,6 +116,7 @@ export default function SignUp() {
                             />
                         </Grid>
                     </Grid>
+                    <div style={{ marginTop: '10px', color: 'red', textAlign: 'center' }}>{auth.errorMessage}</div>
                     <Button
                         type="submit"
                         fullWidth
@@ -140,3 +144,11 @@ export default function SignUp() {
         return signUp;
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        auth: state.auth
+    };
+}
+
+export default connect(mapStateToProps)(SignUp);

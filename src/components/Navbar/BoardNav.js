@@ -1,28 +1,19 @@
-// Components
-import React, { Component } from 'react';
+import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useEffect, useState } from 'react';
+import { connect } from "react-redux";
+import styled from 'styled-components';
+
+import { addUserToBoard, listenBoardName, loadUserBoards, updateBoardName } from "../../actions";
 import BoardMenu from './BoardMenu';
 import BoardTitleMenu from './BoardTitleMenu';
 import InviteMenu from './InviteMenu';
 
-// Icons/UI
-import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
-
-// Router
-
-// Redux
-import { connect } from "react-redux";
-
-// Actions
-import { listenBoardName, updateBoardName, loadUserBoards, addUserToBoard } from "../../actions";
-
-
-// CSS
 const NavWrapper = styled.div`
-display: inline-flex;
+    display: inline-flex;
     align-items: center;
-    background: rgba(0,0,0,.15);
+    /*background-color: ${(props) => props.color || 'rgba(0,0,0,.15)'};*/
+    background-color: rgba(0,0,0,0.15);
     justify-content: space-between;
     width: 100%;
     z-index: 2;
@@ -37,7 +28,7 @@ const NavActionsWrapper = styled.div`
 `;
 const MenuActionButton = styled.div`
     border-radius: .3rem;
-    background-color: rgba(255,255,255,0.24);
+    background-color: rgba(0,0,0,0.16);
     color: white;
     padding: 0.4rem 0.6rem 0.4rem 0.6rem;
     margin-right: 0.4rem;
@@ -53,7 +44,7 @@ const MenuActionButton = styled.div`
 const MenuButton = styled.div`
     border-radius: .3rem;
     padding: 0.4rem 0.6rem 0.4rem 0.6rem;
-    background-color: rgba(255,255,255,0.24);
+    background-color: rgba(0,0,0,0.16);
     color: white;
     
     &:hover {
@@ -63,71 +54,60 @@ const MenuButton = styled.div`
     
 `;
 
-class BoardNav extends Component {
+function BoardNav(props) {
 
-    constructor(props) {
-        super(props);
+    const [showNameMenu, setShowNameMenu] = useState(false);
+    const [boardName, setBoardName] = useState("");
+    const [showInviteMenu, setShowInviteMenu] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState("");
+    const [showBoardMenu, setShowBoardMenu] = useState(false);
+
+    const { backgroundColor } = props.theme;
+
+    const handleShowBoardMenu = () => {
+        setShowBoardMenu(!showBoardMenu);
     }
 
-    state = {
-        showNameMenu: false,
-        boardName: '',
-        showInviteMenu: false,
-        inviteEmail: '',
+    const handleShowNameMenu = () => {
+        setShowNameMenu(!showNameMenu);
     }
 
-    handleShowMenu = () => {
-        this.setState({
-            showNameMenu: !this.state.showNameMenu,
-        });
+    const handleShowInvite = () => {
+        setShowInviteMenu(!showInviteMenu);
     }
 
-    handleShowInvite = () => {
-        this.setState({
-            showInviteMenu: !this.state.showInviteMenu,
-        });
-    }
-
-    handleSubmitInvite = (e) => {
+    const handleSubmitInvite = (e) => {
         e.preventDefault();
-        const email = this.state.inviteEmail;
+        const email = inviteEmail;
         if (email.length > 0 && email.length < 50) {
-            this.props.addUserToBoard(email, this.props.boardId);
+            props.addUserToBoard(email, props.boardId);
         }
-        this.setState({
-            showInviteMenu: !this.state.showInviteMenu,
-        });
+        setShowInviteMenu(!showInviteMenu);
     }
 
-    handleNameSubmit = (e) => {
+    const handleNameSubmit = (e) => {
         e.preventDefault();
-        const newName = this.state.boardName;
+        const newName = boardName;
         if (newName.length > 0 && newName.length < 30) {
-            this.props.updateBoardName(newName, this.props.boardId);
+            props.updateBoardName(newName, props.boardId);
         }
-        this.setState({
-            showNameMenu: !this.state.showNameMenu,
-        });
+        setShowNameMenu(!showNameMenu);
     }
 
-    onNameChange = (e) => {
+    const onNameChange = (e) => {
         e.preventDefault();
-        this.setState({
-            boardName: e.target.value,
-        });
+        setBoardName(e.target.value);
     }
 
-    onEmailChange = (e) => {
+    const onEmailChange = (e) => {
         e.preventDefault();
-        this.setState({
-            inviteEmail: e.target.value,
-        });
+        setInviteEmail(e.target.value);
     }
 
-    getName = () => {
-        const boardId = this.props.boardId;
+    const getName = () => {
+        const boardId = props.boardId;
         let title = '';
-        this.props.boards.boards.forEach((board) => {
+        props.boards.boards.forEach((board) => {
             if (board.boardId === boardId) {
                 title = board.title;
             }
@@ -135,60 +115,62 @@ class BoardNav extends Component {
         return title;
     }
 
+    useEffect(() => {
+        const boardId = props.boardId;
+        props.loadUserBoards();
+        props.listenBoardName(boardId);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    componentDidMount = () => {
-        const boardId = this.props.boardId;
-        this.props.loadUserBoards();
-        this.props.listenBoardName(boardId);
-    }
 
-    render() {
-        if (this.props.boards.isLoading) {
-            return (<div></div>);
-        }
+    if (props.boards.isLoading) {
+        return (<div></div>);
+    } else {
         return (
-            <NavWrapper>
-                <BoardMenu />
-
-
+            <NavWrapper color={backgroundColor}>
                 <Nav>
                     <NavActionsWrapper>
-                        <MenuActionButton onClick={this.handleShowMenu}>
-                            {this.getName()}
+                        <MenuActionButton onClick={handleShowNameMenu}>
+                            {getName()}
                         </MenuActionButton>
-                        {this.state.showNameMenu && (
+                        {showNameMenu && (
                             <BoardTitleMenu
-                                handleShowMenu={this.handleShowMenu}
-                                handleNameSubmit={this.handleNameSubmit}
-                                placeholder={this.state.boardName}
-                                onNameChange={this.onNameChange}
+                                handleShowNameMenu={handleShowNameMenu}
+                                handleNameSubmit={handleNameSubmit}
+                                placeholder={boardName}
+                                onNameChange={onNameChange}
                             />
                         )}
-                        <MenuActionButton onClick={this.handleShowInvite}>
+                        <MenuActionButton onClick={handleShowInvite}>
                             Invite
-                        </MenuActionButton>
-                        {this.state.showInviteMenu && (
+                    </MenuActionButton>
+                        {showInviteMenu && (
                             <InviteMenu
-                                handleShowInvite={this.handleShowInvite}
-                                handleSubmitInvite={this.handleSubmitInvite}
-                                onEmailChange={this.onEmailChange}
+                                handleShowInvite={handleShowInvite}
+                                handleSubmitInvite={handleSubmitInvite}
+                                onEmailChange={onEmailChange}
                             />
                         )}
 
                     </NavActionsWrapper>
                 </Nav>
-                <MenuButton onClick={this.toggleCloseButton}>
+
+                <BoardMenu showBoardMenu={showBoardMenu} toggleMenu={handleShowBoardMenu} />
+                <MenuButton onClick={handleShowBoardMenu}>
                     <FontAwesomeIcon icon={faEllipsisH} style={{ marginRight: '0.4rem' }} />
                     Show Menu
                 </MenuButton>
+
             </NavWrapper>
         );
     }
+
+
 }
 
 const mapStateToProps = state => ({
     boards: state.boards,
-    board: state.board
+    board: state.board,
+    theme: state.theme,
 });
 
 export default connect(mapStateToProps, { listenBoardName, updateBoardName, loadUserBoards, addUserToBoard })(BoardNav);

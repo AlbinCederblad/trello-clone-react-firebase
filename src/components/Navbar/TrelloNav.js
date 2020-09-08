@@ -1,28 +1,23 @@
-import React from 'react';
-
-
-// UI
-import styled from 'styled-components';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
-
-// Router
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Color from 'color';
+import React from 'react';
+import { connect, useDispatch } from "react-redux";
 import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
+import styled from 'styled-components';
 
-// Actions
-import { useDispatch } from "react-redux";
 import { logoutUser } from "../../actions";
 
 const MainNav = styled.div`
-    background: rgba(0,0,0,.35);
+    /*background: ${(props) => props.color || 'rgba(2, 106, 167, 1)'};*/
     margin: auto;
     width: 100%;
     padding: 4px;
     display: flex;
     justify-content: space-between;
     position: relative;
+    background-color: rgba(0,0,0,0.25);
 `;
 
 const Logo = styled.div`
@@ -53,7 +48,7 @@ const Buttons = styled.div`
 
 const SignButton = styled.div`
     border-radius: .3rem;
-    background-color: rgba(255,255,255,0.24);
+    background-color: rgba(0,0,0,0.16);
     color: white;
     padding: 0.4rem 0.6rem 0.4rem 0.6rem;
     &:hover {
@@ -65,7 +60,14 @@ const SignButton = styled.div`
 
 
 
-const TrelloNav = ({ isAuthenticated, isLoading }) => {
+const TrelloNav = (props) => {
+    const { isAuthenticated, isLoading } = props;
+    const { backgroundColor } = props.theme;
+
+    let newColor = '';
+    if (backgroundColor) {
+        newColor = Color(backgroundColor).darken(0.2).hsl().string();
+    }
 
     const dispatch = useDispatch();
     const history = useHistory();
@@ -85,7 +87,7 @@ const TrelloNav = ({ isAuthenticated, isLoading }) => {
         </Buttons>
     );
     return (
-        <MainNav>
+        <MainNav color={newColor}>
             <Link to="/">
                 <SignButton>
                     <FontAwesomeIcon icon={faHome} size="lg" />
@@ -103,4 +105,8 @@ const TrelloNav = ({ isAuthenticated, isLoading }) => {
     );
 }
 
-export default TrelloNav;
+const mapStateToProps = (state) => ({
+    theme: state.theme,
+})
+
+export default connect(mapStateToProps, null)(TrelloNav);

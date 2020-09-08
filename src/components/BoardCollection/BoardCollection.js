@@ -1,16 +1,14 @@
-import React, { Component } from 'react'
-
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import BoardTile from './BoardTile';
-import CreateBoardModal from './CreateBoardModal';
-
+import React, { Component } from 'react'
+import FadeIn from 'react-fade-in';
+import Loader from 'react-loader-spinner';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
+
 import { loadUserBoards } from '../../actions/';
 import { loadBoard } from '../../actions/board';
-
-import FadeIn from 'react-fade-in';
-
-import styled from 'styled-components';
+import BoardTile from './BoardTile';
+import CreateBoardModal from './CreateBoardModal';
 
 const Collection = styled.div`
     display: flex;
@@ -21,10 +19,14 @@ const Collection = styled.div`
     min-height: 70vh;
 `;
 
+const Paper = styled.div`
+    background: rgba(255,255,255,0.85);
+    padding: 2rem;
+    border-radius: 1rem;
+`;
+
 const Title = styled.div`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    position: center;
     padding: 5px;
     font-size: 16px;
     font-weight: 700;
@@ -40,15 +42,17 @@ const Boards = styled.div`
     display: flex;
     flex-wrap: wrap;
     max-width: 600px;
-    margin-bottom: 10px;
+    margin-bottom: 2rem;
+    margin-top: 1rem;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 `;
 
 class BoardCollection extends Component {
     constructor(props) {
         super(props);
-
         this.handleClickBoard = this.handleClickBoard.bind(this);
-
     };
     componentDidMount() {
         this.props.loadUserBoards();
@@ -66,48 +70,30 @@ class BoardCollection extends Component {
     };
 
     render() {
-        if (this.props.boards.isLoading) {
-            return (
-                <FadeIn>
-                    <Collection>
+        return (
+            <FadeIn>
+                <Collection>
+                    <Paper>
                         <Title>
                             <AccountCircleIcon />
-                            <Spacing></Spacing>
-                            <p>Your boards</p>
-                        </Title>
-                        <Boards>
-                        </Boards>
-                        <Spacing />
-                        <CreateBoardModal />
-                    </Collection>
-                </FadeIn>
-            );
-        } else {
-            const boardsList =
-                this.props.boards.boards.map((board, index) => (
-                    <Spacing key={board.boardId}>
-                        <BoardTile onClick={(e) => this.handleClickBoard(e, board.boardId)} index={index} title={board.title} key={board.boardId} boardId={board.boardId} />
-                    </Spacing>
-                ));
-            return (
-                <FadeIn>
-                    <Collection>
-                        <Title>
-                            <AccountCircleIcon />
-                            <Spacing></Spacing>
                             <p>Your boards</p>
                         </Title>
                         <Boards>
                             {
-                                boardsList
+                                this.props.boards.isLoading ? <Loader /> :
+                                    this.props.boards.boards.map((board, index) => (
+                                        <Spacing key={board.boardId}>
+                                            <BoardTile onClick={(e) => this.handleClickBoard(e, board.boardId)} index={index} title={board.title} key={board.boardId} boardId={board.boardId} />
+                                        </Spacing>
+                                    ))
                             }
                         </Boards>
                         <Spacing />
                         <CreateBoardModal />
-                    </Collection>
-                </FadeIn>
-            )
-        }
+                    </Paper>
+                </Collection>
+            </FadeIn>
+        )
     }
 }
 

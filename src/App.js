@@ -1,21 +1,27 @@
-import React from 'react';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from "react-router-dom";
-import { useSelector } from "react-redux";
+import React, { useEffect } from 'react';
+import { connect } from "react-redux";
+import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 
+import { changeBackground, changePhoto, getPhotosList } from './actions';
+import Board from './components/Board/Board';
+import BoardCollection from './components/BoardCollection/BoardCollection';
+import TrelloNav from './components/Navbar/TrelloNav';
 import ProtectedRoute from "./components/ProtectedRoute";
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
-import BoardCollection from './components/BoardCollection/BoardCollection';
-import Board from './components/Board/Board';
-import TrelloNav from './components/Navbar/TrelloNav';
 
 function App(props) {
 
-  const { isAuthenticated, isLoading } = useSelector(state => state.auth);
+  const { isAuthenticated, isLoading } = props.auth;
+
+  useEffect(() => {
+    document.body.style.backgroundImage = 'url(https://images.unsplash.com/photo-1534528696266-aade1e8bae09?ixlib=rb-1.2.1&q=85&fm=jpg&crop=entropy&cs=srgb&ixid=eyJhcHBfaWQiOjE2MDg5Mn0)';
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.width = '100vl';
+    document.body.style.height = '100vh';
+
+    props.getPhotosList("ocean");
+  }, []);
 
   return (
     <Router>
@@ -35,4 +41,10 @@ function App(props) {
     </Router>
   );
 }
-export default App;
+
+const mapStateToProps = state => ({
+  theme: state.theme,
+  auth: state.auth,
+});
+
+export default connect(mapStateToProps, { changeBackground, changePhoto, getPhotosList })(App);

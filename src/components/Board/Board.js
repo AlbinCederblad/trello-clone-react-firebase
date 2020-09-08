@@ -1,19 +1,13 @@
 import React, { Component } from 'react'
-
-// Components
-import List from './List';
-import ActionButton from './ActionButton';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-
-// Store
-import { connect } from 'react-redux';
-import { sort, updateBoard, loadBoard, listenBoard } from '../../actions/board';
-
-// CSS
-import styled from 'styled-components';
 import FadeIn from 'react-fade-in';
-import BoardNav from '../Navbar/BoardNav';
+import { connect } from 'react-redux';
+import styled from 'styled-components';
 
+import { listenBoard, loadBoard, sort, updateBoard } from '../../actions/board';
+import BoardNav from '../Navbar/BoardNav';
+import ActionButton from './ActionButton';
+import List from './List';
 
 const ListsContainer = styled.div`
   display: flex;
@@ -22,7 +16,7 @@ const ListsContainer = styled.div`
 
 const BoardStyle = styled.div`
     position: absolute;
-    background-color: #519839;
+    /*background-color: ${(props) => props.color || '#519839'};*/
 `;
 
 class Board extends Component {
@@ -37,10 +31,10 @@ class Board extends Component {
     componentDidMount() {
         const boardId = this.props.match.params.id;
         this.props.listenBoard(boardId);
-        document.body.style.backgroundColor = '#519839';
     }
+
     componentWillUnmount() {
-        document.body.style.backgroundColor = '#FFFFFF';
+
     }
 
     onDragEnd = (result) => {
@@ -66,7 +60,7 @@ class Board extends Component {
             <FadeIn>
                 {this.props.auth.isAuthenticated && <BoardNav boardId={this.props.match.params.id} />}
                 <DragDropContext onDragEnd={this.onDragEnd}>
-                    <BoardStyle>
+                    <BoardStyle color={this.props.theme.backgroundColor}>
                         <Droppable droppableId="all-lists" direction="horizontal" type="list">
                             {provided => (
                                 <ListsContainer {...provided.droppableProps} ref={provided.innerRef}>
@@ -92,7 +86,8 @@ class Board extends Component {
 
 const mapStateToProps = state => ({
     board: state.board,
-    auth: state.auth
+    auth: state.auth,
+    theme: state.theme,
 });
 
 export default connect(mapStateToProps, { sort, updateBoard, loadBoard, listenBoard })(Board);

@@ -1,13 +1,12 @@
-import React, { Component } from 'react';
-
-import AddIcon from '@material-ui/icons/Add';
-import styled from 'styled-components';
-import Card from '@material-ui/core/Card';
-import TextAreaAutosize from 'react-textarea-autosize';
 import Button from '@material-ui/core/Button';
-
+import Card from '@material-ui/core/Card';
+import AddIcon from '@material-ui/icons/Add';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { addList, addCard, updateBoard } from '../../actions/board';
+import TextAreaAutosize from 'react-textarea-autosize';
+import styled from 'styled-components';
+
+import { addCard, addList, updateBoard } from '../../actions/board';
 
 class ActionButton extends Component {
 
@@ -63,7 +62,7 @@ class ActionButton extends Component {
         const buttonText = list ? 'Add another card' : 'Add another list';
         const buttonTextOpacity = list ? 1 : 1;
         const buttonTextColor = list ? '#5e6c84' : 'white';
-        const buttonTextBackground = list ? 'inherit' : 'rgba(255,255,255,0.24)';
+        const buttonTextBackground = list ? 'inherit' : 'rgba(0,0,0,0.16)';
 
         const Button = styled.div`
             display: inline-flex;
@@ -86,7 +85,7 @@ class ActionButton extends Component {
             background-color: ${buttonTextBackground};
             
             &:hover {
-                background-color: ${list ? '#e1e2e6' : 'rgba(255, 255, 255, 0.3)'};
+                background-color: ${list ? '#e1e2e6' : 'rgba(0, 0, 0, 0.1)'};
                 transition: 0.3s; 
             }
         `;
@@ -146,13 +145,14 @@ class ActionButton extends Component {
                                 margin: '0px 8px 8px 8px',
                                 textTransform: 'capitalize',
                                 fontSize: '14px',
-                                fontWeight: '400',
                             }}>{buttonText}</Button>
                         <Button style={{
                             margin: '0px 8px 8px 0px',
                             fontSize: '14px',
                             textTransform: 'capitalize',
-                        }}>close</Button>
+                            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                            color: 'black',
+                        }} variant='contained'>close</Button>
                     </Buttons>
                 </div>
             </div>
